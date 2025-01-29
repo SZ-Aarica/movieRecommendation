@@ -26,8 +26,8 @@
                           <a href={{url('/home')}}
                               class="rounded-md {{ request()->is('home') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} 
                                   px-3 py-2 text-sm font-medium">home page</a>
-                          <a href="#"
-                              class="rounded-md {{ request()->is('your-taste') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} 
+                          <a href={{url('/taste')}}
+                              class="rounded-md {{ request()->is('your taste') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} 
                                  px-3 py-2 text-sm font-medium">your taste</a>
                           <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white hidden">Calendar</a>
                       </div>

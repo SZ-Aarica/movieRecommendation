@@ -27,6 +27,12 @@ class movieController extends Controller
         //send data to the view
     }
     public function search() {}
+
+    public function suggest()
+    {
+        return view('movies.taste', ['datas' => null]);
+    }
+
     public function show(Movie $movie)
     {
         return view('movies.show', ['movies' => $movie]);
