@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\movieController;
 use App\Http\Controllers\ProfileController;
+use App\Models\Movie;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
@@ -14,35 +15,16 @@ Route::get('/', function () {
 //index
 
 Route::get('/home', [movieController::class, 'index']);
-//search
-Route::post('/home', function () {
-    $validatedAtr = request()->validate([
-        'movie' => ['required', 'min:3'],
-    ]);
-    //https://api.themoviedb.org/3/search/movie?query=blue%20valentine&language=en-US&page=1&api_key=7429882064bd146f8c3147d6ec343807
-});
 
 //suggest
 Route::get(
     '/taste',
     [movieController::class, 'suggest']
 );
-
+//similar
 Route::post(
     '/taste',
-    function () {
-        $validatedAtr = request()->validate([
-            'movie' => ['required', 'min:3'],
-        ]);
-        $apiKey = '1038147-moviesug-6E204011';
-        $client = new Client();
-        $Url = "https://tastedive.com/api/similar?q={$validatedAtr['movie']}&type=movie&k=$apiKey";
-
-        $response = $client->get($Url);
-        $data = json_decode($response->getBody(), true);
-        //dd($data['similar']['results']);
-        return view('movies.taste', ['datas' => $data['similar']['results']]);
-    }
+    [movieController::class, 'similar']
 );
 
 

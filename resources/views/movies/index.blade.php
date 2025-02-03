@@ -4,40 +4,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>home</title>
+    <title>Home</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="">
+<body>
     <x-page-heading />
-    <form action="{{ url('/home') }}" method="post">
-        @csrf
-        <div class="flex justify-left">
-            <div class="ml-9  ml-40">
-                <label for="movie " class="block text-2xl my-5snv">Movie</label>
-                <input class="pr-40 rounded" type="text" name="movie" id="movie" placeholder="search for a movie ">
-                <input type="submit" value="search" class="bg-white px-10 hover:bg-lime-200 duration-500 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
 
-            </div>
-        </div>
+    <!-- Search Form -->
+    <x-form action="{{ route('movies.index') }}" method="GET" placeholder="Find your movie">
+        <!-- the inpute velue name in movie that why we use 'movie' -->
+    </x-form>
 
-    </form>
+    <!-- Display Search Query -->
+    <!--if there was something searched in the movie form  it return the serched value  (true/false)-->
+    @if($searchQuery)
+    <p class="ml-40 mt-4">Search Results for: "{{ $searchQuery }}"</p>
+    @endif
 
+    <!-- Movie List -->
     <div class="ml-40">
-        <div class="grid grid-cols-3 gap-4 ">
-            @foreach ($movies as $movie)
-            <div class=" rounded-md">
-                <a href="{{ route('movies.show', ['movie' => $movie->id]) }}">
-                    <div>{{ $movie->title }}
-                        <br /> {{substr($movie->release_date , 0 , 4)}}
+        <div class="grid grid-cols-2 gap-2">
+            @forelse ($movies as $movie)
+            <div class="rounded-md border-2 border-solid">
+                <a href="{{ route('movies.show', ['movie' => $movie->id , 'genres' => implode(',', $genre->idToNameGenre($movie->genres))]) }}">
+                    <div class="grid grid-cols-3 gap-x-1 gap-y-2">
+                        <div>
+                            <img src="https://image.tmdb.org/t/p/w200/{{ $movie->poster_path }}" alt="{{ $movie->title }}">
+                        </div>
+                        <div>
+                            <strong>{{ $movie->title }} {{ substr($movie->release_date, 0, 4) }}</strong>
+                            <br>
+                            {{ $movie->overview }}
+                            <p class="text-gray-700">
+                                @foreach ($genre->IdToNameGenre($movie->genres) as $genreName)
+                                {{ htmlspecialchars($genreName) }},
+                                @endforeach
+                            </p>
+                        </div>
                     </div>
-                    <img src="https://image.tmdb.org/t/p/w200/{{$movie['poster_path']}}" alt="{{$movie['title']}}">
                 </a>
             </div>
-            @endforeach
+            @empty
+            <p>No movies found.</p>
+            @endforelse
         </div>
     </div>
-    <div class=" ml-9 ml-40">
+
+    <!-- Pagination Links -->
+    <div class="ml-40 mt-4">
         {{ $movies->links() }}
     </div>
 </body>

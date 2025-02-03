@@ -26,11 +26,20 @@ class FetchPopularMovies extends Command
      */
     public function handle()
     {
+        $tmdbService = new TmbdService();
         try {
-            // Call the TmdbService to fetch and store popular movies
-            (new TmbdService)->fetchAndStorePopularMovies();
 
+            // Fetch and store genres (before movies, so movies can link to genres)
+            $tmdbService->fetchGenreIdAndNames();
+            $this->info('Movie genres fetched and stored successfully.');
+
+            // Fetch and store popular movies
+            $tmdbService->fetchAndStorePopularMovies();
             $this->info('Popular movies fetched and stored successfully.');
+            // Call the TmdbService to fetch and store popular movies
+            // (new TmbdService)->fetchAndStorePopularMovies();
+
+            // $this->info('Popular movies fetched and stored successfully.');
         } catch (\Exception $e) {
             $this->error('Failed to fetch popular movies: ' . $e->getMessage());
         }
