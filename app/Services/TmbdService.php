@@ -36,6 +36,7 @@ class TmbdService
             $movies = $movies['results'];
 
             foreach ($movies as $movie) {
+                $movieDetail = $this->makeApiCall("/movie/{$movie['id']}", ['api_key' => $this->apiKey]);
                 Movie::updateOrCreate(
                     ['id' => $movie['id']], // Use TMDb's ID as the primary key
                     [
@@ -47,7 +48,9 @@ class TmbdService
                         'vote_average' => $movie['vote_average'],
                         'vote_count' => $movie['vote_count'],
                         'release_date' => $movie['release_date'],
-                        'genres' => $movie['genre_ids']
+                        'genres' => $movie['genre_ids'],
+                        'runtime' => $movieDetail['runtime'] ?? null,
+
                     ]
                 );
             }

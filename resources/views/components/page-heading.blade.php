@@ -1,5 +1,5 @@
   @vite(['resources/css/app.css', 'resources/js/app.js'])
-  <nav class="bg-lime-900">
+  <nav class="bg-[#384B70]">
       <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
           <div class="relative flex h-16 items-center justify-between">
               <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
@@ -21,13 +21,13 @@
                       <div class="flex space-x-4">
                           <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
                           <a href="{{ url('/dashboard') }}"
-                              class="rounded-md {{ request()->is('dashboard') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} 
+                              class="rounded-md {{ request()->is('dashboard') ? 'bg-gray-900 text-white' : 'text-[#FCFAEE] hover:bg-gray-700 hover:text-white' }} 
                                 px-3 py-2 text-sm font-medium" aria-current="page" aria-current="page">Dashboard</a>
                           <a href={{url('/home')}}
-                              class="rounded-md {{ request()->is('home') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} 
+                              class="rounded-md {{ request()->is('home') ? 'bg-gray-900 text-white' : 'text-[#FCFAEE] hover:bg-gray-700 hover:text-white' }} 
                                   px-3 py-2 text-sm font-medium">home page</a>
                           <a href={{url('/taste')}}
-                              class="rounded-md {{ request()->is('your taste') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} 
+                              class="rounded-md {{ request()->is('your taste') ? 'bg-gray-900 text-white' : 'text-[#FCFAEE] hover:bg-gray-700 hover:text-white' }} 
                                  px-3 py-2 text-sm font-medium">your taste</a>
                           <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white hidden">Calendar</a>
                       </div>

@@ -25,6 +25,7 @@ return new class extends Migration
             $table->integer('vote_count');
             $table->date('release_date');
             $table->json('genres');
+            $table->integer('runtime');
             $table->timestamps();
         });
     }

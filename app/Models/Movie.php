@@ -11,4 +11,10 @@ class Movie extends Model
     protected $casts = [
         'genres' => 'array',
     ];
+
+
+    public function comment()
+    {
+        return $this->hasMany(comment::class);
+    }
 }

@@ -10,12 +10,17 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use App\Models\Movie;
+use Illuminate\Support\Facades\Http;
 
 class movieController extends Controller
 {
     public function index(Request $request)
     {
 
+        /*  $uu = "https://api.themoviedb.org/3/movie/426063?language=en-US&api_key=7429882064bd146f8c3147d6ec343807";
+        //$res = Http::get('https://api.themoviedb.org/3/movie',);
+        $res = (new Client())->get($uu);
+        dd(json_decode($res->getBody(), true));*/
         $genre = new genre();
         //dd($genre[0]);
         // Check if a search query is provided
@@ -43,6 +48,7 @@ class movieController extends Controller
 
                     if (isset($data['results'])) {
                         foreach ($data['results'] as $movieData) {
+
                             Movie::updateOrCreate(
                                 ['id' => $movieData['id']],
                                 [

@@ -36,11 +36,7 @@
                             <strong>{{ $movie->title }} {{ substr($movie->release_date, 0, 4) }}</strong>
                             <br>
                             {{ $movie->overview }}
-                            <p class="text-gray-700">
-                                @foreach ($genre->IdToNameGenre($movie->genres) as $genreName)
-                                {{ htmlspecialchars($genreName) }},
-                                @endforeach
-                            </p>
+
                         </div>
                     </div>
                 </a>
