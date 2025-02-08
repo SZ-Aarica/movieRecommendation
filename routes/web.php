@@ -27,9 +27,17 @@ Route::post(
     [movieController::class, 'similar']
 );
 
+//favourite
+Route::post('/add-favorite', [movieController::class, 'addFavorite']);
+Route::post('/remove-favorite', [movieController::class, 'removeFavorite']);
 
 
+
+//show
 Route::get('movies.show', [movieController::class, 'show']);
+
+Route::post('/movies/{movie}', [movieController::class, 'addComment'])->name('movies.show');
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');

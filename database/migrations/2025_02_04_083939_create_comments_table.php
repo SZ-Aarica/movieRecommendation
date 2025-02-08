@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Movie::class);
-            $table->string('comment');
+            $table->text('comment');
             $table->timestamps();
         });
     }

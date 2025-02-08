@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class comment extends Model
 {
-    //
+    protected $fillable = ['user_id', 'movie_id', 'comment'];
     public function movie()
     {
         return $this->belongsTo(Movie::class);
