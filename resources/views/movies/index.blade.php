@@ -27,7 +27,7 @@
         <div class="grid grid-cols-2 gap-2">
             @forelse ($movies as $movie)
             <div class="rounded-md border-2 border-solid">
-                <a href="{{ route('movies.show', ['movie' => $movie->id , 'genres' => implode(',', $genre->idToNameGenre($movie->genres))]) }}">
+                <a href="{{ route('movies.show', ['movie' => $movie->id])}}">
                     <div class="grid grid-cols-3 gap-x-1 gap-y-2">
                         <div>
                             <img src="https://image.tmdb.org/t/p/w200/{{ $movie->poster_path }}" alt="{{ $movie->title }}">

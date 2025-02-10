@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Models\Actor;
 use App\Models\Genre;
 use Illuminate\Support\Facades\Http;
 use App\Models\Movie;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class TmbdService
@@ -28,13 +30,57 @@ class TmbdService
 
         return $response->json();
     }
+    public function addActors(int $id)
+    {
+        $actor =  $this->makeApiCall("/person/{$id}", ['api_key' => $this->apiKey]);
+        if (isset($actor['id'], $actor['name'])) {
+            // Call addData to insert or update the actor in the database
+            Actor::addData($actor);
+        } else {
+            // Handle cases where the API does not return valid actor data
+            throw new \Exception("Invalid actor data received from TMDb for ID: {$id}");
+        }
+    }
+    public function FetchCredits()
+    {
+        $movies = (new Movie())->getMovies();
+        foreach ($movies as $movie) {
+            $credits = $this->makeApiCall(
+                "/movie/{$movie['id']}/credits?language=en-US",
+                ['api_key' => $this->apiKey]
+            );
+
+            foreach ($credits['cast'] as $castMember) {
+                // Check for required fields from the API response
+                if (!isset($castMember['id'])) {
+                    continue;
+                }
+                $actorExists = Actor::where('id', $castMember['id'])->exists();
+
+                if (!$actorExists) {
+                    // If the actor doesn't exist, fetch and add them to the database
+                    $this->addActors($castMember['id']);
+                }
+
+                DB::table('actor_movie')->updateOrInsert(
+                    [
+                        'movie_id' => $movie->id,
+                        'actor_id' => $castMember['id'],
+                    ],
+                    [
+                        'character' => $castMember['character'] ?? null,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]
+                );
+            }
+        }
+    }
     public function fetchAndStorePopularMovies()
     {
         try {
-
             $movies = $this->makeApiCall('/movie/popular', ['api_key' => $this->apiKey]);
             $movies = $movies['results'];
-
             foreach ($movies as $movie) {
                 $movieDetail = $this->makeApiCall("/movie/{$movie['id']}", ['api_key' => $this->apiKey]);
                 Movie::updateOrCreate(

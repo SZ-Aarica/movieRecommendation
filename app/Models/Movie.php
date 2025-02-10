@@ -12,9 +12,18 @@ class Movie extends Model
         'genres' => 'array',
     ];
 
+    public function actors()
+    {
+        return $this->belongsToMany(Actor::class)->withPivot('character_name');
+    }
 
     public function comment()
     {
         return $this->hasMany(comment::class);
+    }
+
+    public function getMovies()
+    {
+        return self::all();
     }
 }

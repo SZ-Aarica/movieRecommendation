@@ -5,8 +5,10 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <div class="container" style="background-color: #FCFAEE;">
     <div class="grid grid-flow-col  gap-4 " id="favorites-container"
+        @auth
         data-user-id="{{ auth()->user()->id }}"
-        data-movie-id="{{ $movies->id }}">
+        data-movie-id="{{ $movies->id }}"
+        @endauth>
 
         <div class="row-span-3 mt-16"><!--1-->
             <img class="col-span-2 "
@@ -56,25 +58,61 @@
         </div>
     </div>
 
-    <div class="comments  ml-10 text-2xl">
-        <p> what do you think about this movie?</p>
+    <div>
+        <div class="grid grid-cols-2 gap-1">
+            <div><!--col 1-->
+                <div class="comments text-2xl">
+                    @foreach ($comments->getComments($movies) as $comment)
+                    @if ($loop->iteration <= 2)
+                        <div class="border-2 rounded-lg mx-16 mt-1 shadow-md ">
+                        <p class=" p-5">
+                            A review by {{$user->getUserName( $comment->user_id)}}
+                            <span class="text-base">
+                                written on {{str_replace("-", "/",  strstr($comment->created_at , ' ' , true))}}
+                                {{strtotime(5)}}
+                            </span>
+                            <br>
+                            {{$comment->comment}}
+                        </p>
+                </div>
+                @endif
+                @endforeach
+                <a href="{{ route('movies.comments', ['movie' => $movies->id]) }}"
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">show more comments</a>
+            </div>
 
-        <form method="post" action="{{ route('movies.show' , ['movie' => $movies->id ]) }}">
-            @csrf
-            <div class="grid grid-cols-4 gap-4">
+        </div>
+        <div><!--col 2-->
 
+            @auth
+            <form method="post" action="{{ route('movies.show' , ['movie' => $movies->id ]) }}">
+                @csrf
                 <div class="col-span-4">
                     <input type="text" name="user_id" value="{{auth()->user()->id }}" hidden>
                     <input type="text" name="movie_id" value="{{$movies->id}}" hidden>
-                    <label for="name" class="block text-2xl my-5snv">name:</label>
-                    <input type="text" class="pr-10 block rounded" value="{{auth()->user()->name }}" disabled>
-                    <textarea name="comment" class="pr-40 block rounded mt-3" id="comment">
-            </textarea>
+                    <label for="name" class="block text-2xl my-5snv">share your opinion:</label>
+                    <input type="text" class="pl-5 mt-1 h-[3rem] block rounded" value="{{auth()->user()->name }}" disabled>
+                    <textarea name="comment" class="w-[500px] h-[7rem] block rounded mt-3" id="comment">
+                    </textarea>
                     <button type="submit" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">Submit</button>
                 </div>
-            </div>
-        </form>
+            </form>
+            @else
+            <form class="blur-[2px]">
+                @csrf
+                <div class="col-span-4">
+                    <label for="name" class="block text-2xl my-5snv">share your opinion:</label>
+                    <input type="text" class="pr-10 block rounded" disabled>
+                    <textarea name="comment" class="pr-40 block rounded mt-3" id="comment" disabled>
+                        </textarea>
+                    <button type="submit" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded" disabled>Submit</button>
+                </div>
+            </form>
+            <a href="{{ url('/dashboard') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">sign up and leave a comment</a>
+            @endauth
+        </div>
     </div>
+</div>
 </div>
 <script>
     window.movieId = <?php echo json_encode($movies->id); ?>;

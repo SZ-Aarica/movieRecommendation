@@ -15,4 +15,9 @@ class comment extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function getComments(movie $movie)
+    {
+        return comment::where('movie_id', $movie->id)->get();
+    }
 }

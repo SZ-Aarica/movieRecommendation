@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use App\Models\Movie;
+use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Laravel\Pail\ValueObjects\Origin\Console;
 
@@ -113,9 +114,18 @@ class movieController extends Controller
 
     public function show(Movie $movie)
     {
-
+        $comments = new comment();
         $genre = new genre();
-        return view('movies.show', ['movies' => $movie, 'genres' => $genre]);
+        $user = new User();
+        return view(
+            'movies.show',
+            [
+                'movies' => $movie,
+                'genres' => $genre,
+                'comments' => $comments,
+                'user' => $user
+            ]
+        );
     }
     public function addComment(Request $request)
     {
@@ -153,6 +163,13 @@ class movieController extends Controller
         ]);
 
         return response()->json(['message' => 'Movie added to your favorites.'], 201);
+    }
+    //reviews
+    public function displayAllReviews(Movie $movie)
+    {
+        $comments = new comment();
+        $user = new User();
+        return view('movies.comments', ['comments' => $comments, 'movie' => $movie, 'user' => $user]);
     }
 
     /**

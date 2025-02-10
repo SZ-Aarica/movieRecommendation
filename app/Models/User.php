@@ -54,4 +54,9 @@ class User extends Authenticatable
     { //user has many favourite movies
         $this->hasMany(favourite::class);
     }
+
+    public static function getUserName(int $id)
+    {
+        return User::where('id', $id)->first()->name;
+    }
 }
