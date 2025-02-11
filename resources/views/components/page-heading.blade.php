@@ -29,8 +29,13 @@
                           <a href={{url('/taste')}}
                               class="rounded-md {{ request()->is('your taste') ? 'bg-gray-900 text-white' : 'text-[#FCFAEE] hover:bg-gray-700 hover:text-white' }} 
                                  px-3 py-2 text-sm font-medium">your taste</a>
-                          <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white hidden">Calendar</a>
+                          <a href="#" hidden class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white content-end">Calendar</a>
+
                       </div>
+
+                  </div>
+                  <div class="-mx-3 flex flex-1 justify-end">
+                      <a href="{{ route('register') }}" class="rounded-md mt-1 mb-3 px-3 py-2 text-sm font-medium text-[#FCFAEE] hover:bg-gray-700 hover:text-white">register</a>
                   </div>
               </div>
 

@@ -114,6 +114,8 @@ class movieController extends Controller
 
     public function show(Movie $movie)
     {
+
+        $movie->load('actors');
         $comments = new comment();
         $genre = new genre();
         $user = new User();
@@ -141,6 +143,7 @@ class movieController extends Controller
 
     public function addFavorite(Request $request)
     {
+        dd($request->all());
         // Validate incoming request
         $request->validate([
             'user_id' => 'required|exists:users,id',

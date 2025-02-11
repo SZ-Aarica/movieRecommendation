@@ -28,8 +28,10 @@ Route::post(
 );
 
 //favourite
-Route::post('/add-favorite', [movieController::class, 'addFavorite']);
-Route::post('/remove-favorite', [movieController::class, 'removeFavorite']);
+Route::middleware(['auth'])->group(function () {
+    Route::post('/add-favorite', [movieController::class, 'addFavorite']);
+    Route::post('/remove-favorite', [movieController::class, 'removeFavorite']);
+});
 //reviews
 //Route::get('/movies/comments', [movieController::class, 'displayAllReviews'])->name('movies.comments');
 Route::get('/movies/comments/{movie}', [movieController::class, 'displayAllReviews'])->name('movies.comments');

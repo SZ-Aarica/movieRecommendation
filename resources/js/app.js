@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Optionally, handle UI updates or notifications here
             })
             .catch(error => {
-                console.error('Error:', error);
+              
                 // Optionally, revert UI changes or notify the user of the error
             });
 

@@ -12,7 +12,12 @@ class Actor extends Model
 
     public function movies()
     {
-        return $this->belongsToMany(Movie::class)->withPivot('character_name');
+        return $this->belongsToMany(Movie::class)->withPivot('character');
+    }
+
+    public function IdToName(int $id)
+    {
+        return self::where('id', $id)->first()->name;
     }
 
     public static function addData($actor)

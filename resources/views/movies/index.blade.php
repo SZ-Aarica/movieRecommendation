@@ -8,7 +8,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body>
+<body style="background-color: #E2E2B6;">
     <x-page-heading />
 
     <!-- Search Form -->
@@ -23,20 +23,20 @@
     @endif
 
     <!-- Movie List -->
-    <div class="ml-40">
-        <div class="grid grid-cols-2 gap-2">
+    <div class="mx-40">
+        <div class="grid grid-cols-1 gap-2 mt-5 ">
             @forelse ($movies as $movie)
-            <div class="rounded-md border-2 border-solid">
+            <div class="rounded-md border-2 border-solid shadow-lg max-w-[1000px]">
                 <a href="{{ route('movies.show', ['movie' => $movie->id])}}">
-                    <div class="grid grid-cols-3 gap-x-1 gap-y-2">
+                    <div class="grid grid-flow-col  ">
                         <div>
                             <img src="https://image.tmdb.org/t/p/w200/{{ $movie->poster_path }}" alt="{{ $movie->title }}">
                         </div>
-                        <div>
-                            <strong>{{ $movie->title }} {{ substr($movie->release_date, 0, 4) }}</strong>
+                        <div class="ml-5 mt-5">
+                            <p class="text-2xl ">{{ $movie->title }} {{ substr($movie->release_date, 0, 4) }}
+                            </p>
                             <br>
-                            {{ $movie->overview }}
-
+                            <p class="text-xl"> {{ $movie->overview }}</p>
                         </div>
                     </div>
                 </a>
