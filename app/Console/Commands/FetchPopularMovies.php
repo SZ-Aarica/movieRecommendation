@@ -34,13 +34,13 @@ class FetchPopularMovies extends Command
             //$this->info('Movie genres fetched and stored successfully.');
 
             // Fetch and store popular movies
-            //$tmdbService->fetchAndStorePopularMovies();
-            //$this->info('Popular movies fetched and stored successfully.');
+            // $tmdbService->fetchAndStorePopularMovies();
+            // $this->info('Popular movies fetched and stored successfully.');
             // Call the TmdbService to fetch and store popular movies
             // (new TmbdService)->fetchAndStorePopularMovies();
 
-            $tmdbService->FetchCredits();
-            $this->info('credits has been added.');
+            // $tmdbService->FetchCredits();
+            //  $this->info('credits has been added.');
 
             // $this->info('Popular movies fetched and stored successfully.');
         } catch (\Exception $e) {

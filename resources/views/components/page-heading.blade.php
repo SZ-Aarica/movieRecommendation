@@ -20,9 +20,16 @@
                   <div class="hidden sm:ml-6 sm:block">
                       <div class="flex space-x-4">
                           <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
+                          @auth
                           <a href="{{ url('/dashboard') }}"
                               class="rounded-md {{ request()->is('dashboard') ? 'bg-gray-900 text-white' : 'text-[#FCFAEE] hover:bg-gray-700 hover:text-white' }} 
                                 px-3 py-2 text-sm font-medium" aria-current="page" aria-current="page">Dashboard</a>
+                          @else
+                          <a href="{{ url('/dashboard') }}"
+                              class="rounded-md {{ request()->is('dashboard') ? 'bg-gray-900 text-white' : 'text-[#FCFAEE] hover:bg-gray-700 hover:text-white' }} 
+                                px-3 py-2 text-sm font-medium" aria-current="page" aria-current="page">log in</a>
+                          @endauth
+
                           <a href={{url('/home')}}
                               class="rounded-md {{ request()->is('home') ? 'bg-gray-900 text-white' : 'text-[#FCFAEE] hover:bg-gray-700 hover:text-white' }} 
                                   px-3 py-2 text-sm font-medium">home page</a>
@@ -34,9 +41,12 @@
                       </div>
 
                   </div>
+                  @if (!auth()->check())
                   <div class="-mx-3 flex flex-1 justify-end">
                       <a href="{{ route('register') }}" class="rounded-md mt-1 mb-3 px-3 py-2 text-sm font-medium text-[#FCFAEE] hover:bg-gray-700 hover:text-white">register</a>
                   </div>
+                  @endif
+
               </div>
 
           </div>

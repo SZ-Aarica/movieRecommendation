@@ -13,24 +13,34 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use App\Models\Movie;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Laravel\Pail\ValueObjects\Origin\Console;
 
 class movieController extends Controller
 {
+    protected $tmdbService;
+
+    public function __construct(TmbdService $tmdbService)
+    {
+        $this->tmdbService = $tmdbService;
+    }
+
+    public function dashboard(Request $request)
+    {
+        $user = $request->user();
+        $favorite = new favourite();
+        $favoriteMovieIds = $favorite->getUserFavoriteMovies($user)->pluck('movie_id');
+
+        $favoriteMovies = Movie::whereIn('id', $favoriteMovieIds)->simplePaginate(6);
+
+        return view('dashboard', compact('favoriteMovies'));
+    }
     public function index(Request $request)
     {
 
-
-        /*  $uu = "https://api.themoviedb.org/3/movie/426063?language=en-US&api_key=7429882064bd146f8c3147d6ec343807";
-        //$res = Http::get('https://api.themoviedb.org/3/movie',);
-        $res = (new Client())->get($uu);
-        dd(json_decode($res->getBody(), true));*/
-        $genre = new genre();
-        //dd($genre[0]);
-        // Check if a search query is provided
-        //the form input name id movie
         $searchQuery = $request->input('movie');
+        $ModelMovie = new Movie();
 
         if ($searchQuery) {
             // Validate the search input
@@ -43,6 +53,7 @@ class movieController extends Controller
 
             // If no results are found in the database, fetch from the external API
             if ($movies->isEmpty()) {
+
                 $apiKey = '7429882064bd146f8c3147d6ec343807';
                 $client = new Client();
                 $url = "https://api.themoviedb.org/3/search/movie?query={$validated['movie']}&include_adult=false&language=en-US&page=1&api_key={$apiKey}";
@@ -52,25 +63,14 @@ class movieController extends Controller
                     $data = json_decode($response->getBody(), true);
 
                     if (isset($data['results'])) {
-                        foreach ($data['results'] as $movieData) {
-
-                            Movie::updateOrCreate(
-                                ['id' => $movieData['id']],
-                                [
-                                    'title' => $movieData['title'],
-                                    'overview' => $movieData['overview'],
-                                    'adult' => $movieData['adult'],
-                                    'poster_path' => $movieData['poster_path'],
-                                    'backdrop_path' => $movieData['backdrop_path'],
-                                    'vote_average' => $movieData['vote_average'],
-                                    'vote_count' => $movieData['vote_count'],
-                                    'release_date' => $movieData['release_date'],
-                                    'genres' => json_encode($movieData['genre_ids']),
-                                ]
-                            );
+                        $slicedMovies = array_slice($data['results'], 0, 2);
+                        foreach ($slicedMovies as $movieData) {
+                            //$movieData = $data['results'][0];
+                            $movieDetail = $this->tmdbService->makeApiCall("/movie/{$movieData['id']}");
+                            $ModelMovie->addData($movieData, $movieDetail);
+                            $this->tmdbService->FetchCredits($movieData);
                         }
                     }
-
                     // Re-fetch the movies after updating the database
                     $movies = Movie::where('title', 'like', '%' . $validated['movie'] . '%')->simplePaginate(6);
                 } catch (\Exception $e) {
@@ -80,18 +80,15 @@ class movieController extends Controller
             }
         } else {
             // Default behavior: Show all movies
-            $movies = Movie::simplePaginate(6);
+            $movies = Movie::orderBy('release_date', 'desc')->Paginate(6);
         }
-
         // Pass the movies to the view
         return view('movies.index', [
             'movies' => $movies,
             'searchQuery' => $searchQuery, // Pass the search query to the view
-            'genre' => $genre,
+
         ]);
     }
-
-
     public function suggest()
     {
 
@@ -111,7 +108,6 @@ class movieController extends Controller
         //dd($data['similar']['results']);
         return view('movies.taste', ['datas' => $data['similar']['results']]);
     }
-
     public function show(Movie $movie)
     {
 
@@ -143,26 +139,30 @@ class movieController extends Controller
 
     public function addFavorite(Request $request)
     {
-        dd($request->all());
+
         // Validate incoming request
         $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'movie_id' => 'required|exists:movies,id',
+            'user_id' => 'required|integer',
+            'movie_id' => 'required|integer',
         ]);
 
-        // Check if the favorite already exists to prevent duplicates
-        $exists = favourite::where('user_id', $request->user_id)
-            ->where('movie_id', $request->movie_id)
+        $userId = $request->input('user_id');
+        $movieId = $request->input('movie_id');
+
+        /* return response()->json([
+            'user_id' => $userId,
+            'movie_id' => $movieId,
+        ]);*/
+        $exists = favourite::where('user_id', $userId)
+            ->where('movie_id', $movieId)
             ->exists();
 
         if ($exists) {
             return response()->json(['message' => 'Movie is already in your favorites.'], 200);
         }
-
-        // Create the favorite entry
         favourite::create([
-            'user_id' => $request->user_id,
-            'movie_id' => $request->movie_id,
+            'user_id' => $userId,
+            'movie_id' => $movieId,
         ]);
 
         return response()->json(['message' => 'Movie added to your favorites.'], 201);
@@ -182,21 +182,23 @@ class movieController extends Controller
     {
         // Validate incoming request
         $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'movie_id' => 'required|exists:movies,id',
+            'user_id' => 'required|integer',
+            'movie_id' => 'required|integer',
         ]);
 
-        // Find the favorite entry
-        $favorite = favourite::where('user_id', $request->user_id)
-            ->where('movie_id', $request->movie_id)
+        $userId = $request->input('user_id');
+        $movieId = $request->input('movie_id');
+
+        /*return response()->json([
+            'user_id' => $userId,
+            'movie_id' => $movieId,
+        ]);*/
+
+        $favorite = favourite::where('user_id', $userId)
+            ->where('movie_id', $movieId)
             ->first();
 
-        if (!$favorite) {
-            return response()->json(['message' => 'Movie is not in your favorites.'], 200);
-        }
-
-        // Delete the favorite entry
-        $favorite->delete();
+        $favorite->delete(); //Delete the favorite entry
 
         return response()->json(['message' => 'Movie removed from your favorites.'], 200);
     }

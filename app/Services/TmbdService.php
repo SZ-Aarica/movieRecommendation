@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Log;
 
 class TmbdService
 {
-
     protected $apiKey;
     protected $baseUrl;
 
@@ -22,6 +21,8 @@ class TmbdService
     }
     public function makeApiCall($endpoint, $params = [])
     {
+
+        $params['api_key'] = $this->apiKey;
         $response = Http::get("{$this->baseUrl}{$endpoint}", $params);
 
         if ($response->failed()) {
@@ -32,7 +33,7 @@ class TmbdService
     }
     public function addActors(int $id)
     {
-        $actor =  $this->makeApiCall("/person/{$id}", ['api_key' => $this->apiKey]);
+        $actor =  $this->makeApiCall("/person/{$id}");
         if (isset($actor['id'], $actor['name'])) {
             // Call addData to insert or update the actor in the database
             Actor::addData($actor);
@@ -41,30 +42,32 @@ class TmbdService
             throw new \Exception("Invalid actor data received from TMDb for ID: {$id}");
         }
     }
-    public function FetchCredits()
+    public function FetchCredits($movies)
     {
-        $movies = (new Movie())->getMovies();
-        foreach ($movies as $movie) {
-            $credits = $this->makeApiCall(
-                "/movie/{$movie['id']}/credits?language=en-US",
-                ['api_key' => $this->apiKey]
-            );
+        //$movies = Movie::getRecentMovies(15);
+        //dd($movies);
+        // foreach ($movies as $movie) {
+        $credits = $this->makeApiCall(
+            "/movie/{$movies['id']}/credits?language=en-US"
+        );
+        //Log::debug('Credits for movie ' . $movies['id'], $credits);
+        //dd($credits['cast']);
+        foreach (collect($credits['cast'])->take(10) as $castMember) {
+            // Check for required fields from the API response
+            if (!isset($castMember['id'])) {
+                continue;
+            }
+            $actorExists = Actor::where('id', $castMember['id'])->exists();
 
-            foreach ($credits['cast'] as $castMember) {
-                // Check for required fields from the API response
-                if (!isset($castMember['id'])) {
-                    continue;
-                }
-                $actorExists = Actor::where('id', $castMember['id'])->exists();
 
-                if (!$actorExists) {
-                    // If the actor doesn't exist, fetch and add them to the database
-                    $this->addActors($castMember['id']);
-                }
-
+            if (!$actorExists) {
+                // If the actor doesn't exist, fetch and add them to the database
+                $this->addActors($castMember['id']);
+            }
+            try {
                 DB::table('actor_movie')->updateOrInsert(
                     [
-                        'movie_id' => $movie->id,
+                        'movie_id' => $movies['id'],
                         'actor_id' => $castMember['id'],
                     ],
                     [
@@ -73,34 +76,22 @@ class TmbdService
                         'updated_at' => now(),
                     ]
                 );
+            } catch (\Exception $e) {
+                Log::error("Error in adding data: " . $e->getMessage());
             }
         }
+        // }
     }
     public function fetchAndStorePopularMovies()
     {
+        $ModelMovie = new Movie();
         try {
             $movies = $this->makeApiCall('/movie/popular', ['api_key' => $this->apiKey]);
             $movies = $movies['results'];
             foreach ($movies as $movie) {
                 $movieDetail = $this->makeApiCall("/movie/{$movie['id']}", ['api_key' => $this->apiKey]);
-                Movie::updateOrCreate(
-                    ['id' => $movie['id']], // Use TMDb's ID as the primary key
-                    [
-                        'title' => $movie['title'],
-                        'overview' => $movie['overview'],
-                        'adult' => $movie['adult'],
-                        'poster_path' => $movie['poster_path'],
-                        'backdrop_path' => $movie['backdrop_path'],
-                        'vote_average' => $movie['vote_average'],
-                        'vote_count' => $movie['vote_count'],
-                        'release_date' => $movie['release_date'],
-                        'genres' => $movie['genre_ids'],
-                        'runtime' => $movieDetail['runtime'] ?? null,
-
-                    ]
-                );
+                $ModelMovie->addData($movie, $movieDetail);
             }
-
 
             return true;
         } catch (\Exception $e) {

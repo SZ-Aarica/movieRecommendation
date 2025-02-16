@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use phpDocumentor\Reflection\Types\Boolean;
 
 class favourite extends Model
 {
@@ -19,5 +20,18 @@ class favourite extends Model
     public function movie()
     {
         return $this->belongsTo(Movie::class);
+    }
+
+    public static function existInFavorite(int $movieId, int $userId): Bool
+    { //check if a movie is in the favorite table
+        $exists = self::where('user_id', $userId)
+            ->where('movie_id', $movieId)
+            ->exists();
+        return $exists;
+    }
+
+    public function getUserFavoriteMovies(User $user)
+    {
+        return self::where("user_id", $user->id)->get();
     }
 }
