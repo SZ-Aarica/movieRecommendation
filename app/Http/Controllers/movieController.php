@@ -31,8 +31,9 @@ class movieController extends Controller
         $user = $request->user();
         $favorite = new favourite();
         $favoriteMovieIds = $favorite->getUserFavoriteMovies($user)->pluck('movie_id');
+        //$topMovies = $favorite->mostFavoritedMovies();
 
-        $favoriteMovies = Movie::whereIn('id', $favoriteMovieIds)->simplePaginate(6);
+        $favoriteMovies = Movie::whereIn('id', $favoriteMovieIds)->simplePaginate(2);
 
         return view('dashboard', compact('favoriteMovies'));
     }
@@ -41,6 +42,8 @@ class movieController extends Controller
 
         $searchQuery = $request->input('movie');
         $ModelMovie = new Movie();
+        $favorite = new favourite();
+        $topMovies = $favorite->mostFavoritedMovies();
 
         if ($searchQuery) {
             // Validate the search input
@@ -86,6 +89,7 @@ class movieController extends Controller
         return view('movies.index', [
             'movies' => $movies,
             'searchQuery' => $searchQuery, // Pass the search query to the view
+            'topMovies' => $topMovies,
 
         ]);
     }
@@ -97,8 +101,9 @@ class movieController extends Controller
     public function similar()
     {
         $validatedAtr = request()->validate([
-            'movie' => ['required', 'min:3'],
+            'movie' => ['required', 'min:2'],
         ]);
+
         $apiKey = '1038147-moviesug-6E204011';
         $client = new Client();
         $Url = "https://tastedive.com/api/similar?q={$validatedAtr['movie']}&type=movie&k=$apiKey";

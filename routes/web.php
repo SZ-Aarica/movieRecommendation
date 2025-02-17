@@ -25,7 +25,7 @@ Route::get(
 Route::post(
     '/taste',
     [movieController::class, 'similar']
-);
+)->name('taste');
 
 //favourite
 Route::get('/add-favorite', function () {

@@ -1,6 +1,11 @@
  <x-page-heading />
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+ <script>
+     const tasteUrl = "{{route('taste')}}";
+ </script>
 
  @vite(['resources/css/app.css', 'resources/js/copy.js'])
+ <meta name="csrf-token" content="{{ csrf_token() }}">
 
 
 
@@ -21,14 +26,19 @@
          </x-form>
 
      </div>
-     <div class="p-8">
+     <div class="px-4" id="searchResults">
          @if ($datas > 0)
          <strong class="text-3xl text-center">Similar movies</strong>
          <div class="grid grid-cols-4 gap-4">
              @foreach ($datas as $movie)
-             <div class="bg-[#0f3119] rounded text-center">
-                 <p class="text-to-copy"> {{ $movie['name'] }}</p>
-                 <button class="text-xs copy-button">copy to clipboard</button>
+             <div class="bg-[#0f3119] bg-opacity-80 rounded text-center text-white">
+                 <button class="searchMovie" data-movie-name="{{ $movie['name']  }}">
+
+                     <p class="text-to-copy"> {{ $movie['name'] }}</p>
+                 </button>
+                 <br>
+
+                 <button class="text-xs copy-button pb-1">copy to clipboard</button>
 
              </div>
              @endforeach

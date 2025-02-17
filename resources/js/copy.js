@@ -12,3 +12,42 @@ document.querySelectorAll('.copy-button').forEach(button => {
         });
     });
 });
+
+$(document).ready(function() { $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+   $(document).on('click', '.searchMovie', function() {
+        // Get the movie name from the data attribute
+        const movieName = $(this).data('movie-name');
+        ajaxRequest(tasteUrl,movieName);
+
+        console.log(movieName); // Log the name of the clicked movie
+    });
+});
+
+function ajaxRequest(url , MovieName ){
+   $.ajax({
+            url: url,  // Use the pre-defined URL
+            type: "POST",
+            data: {
+                movie : MovieName
+            },
+            success: function(response, status) {
+                if (status === 'success') {
+                    $("#searchResults").html(response);
+                    console.log('updated');
+                } else {
+                    console.error('Request failed:', status);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
+                if (xhr.status === 422) {
+                    console.error('Validation Errors:', xhr.responseJSON.errors);
+                }
+            },
+            dataType: 'json'
+      });
+}

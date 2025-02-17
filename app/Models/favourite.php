@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use phpDocumentor\Reflection\Types\Boolean;
+use Illuminate\Support\Facades\DB;
 
 class favourite extends Model
 {
@@ -33,5 +33,21 @@ class favourite extends Model
     public function getUserFavoriteMovies(User $user)
     {
         return self::where("user_id", $user->id)->get();
+    }
+
+    public static function mostFavoritedMovies($limit = 1)
+    {
+        $topMovies = self::select('movie_id', DB::raw('COUNT(movie_id) as total_likes'))
+            ->groupBy('movie_id')
+            ->orderByDesc('total_likes')
+            ->limit($limit)
+            ->get();
+
+        return Movie::whereIn('id', $topMovies->pluck('movie_id'))
+            ->get()
+            ->map(function ($movie) use ($topMovies) {
+                $movie->total_likes = $topMovies->firstWhere('movie_id', $movie->id)->total_likes ?? 0;
+                return $movie;
+            });
     }
 }

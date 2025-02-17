@@ -10,14 +10,14 @@
 @endauth
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<div class="container" style="background-color: #FCFAEE;">
-    <div class="grid grid-flow-col gap-2">
+<div class="container">
+    <div class=" grid grid-flow-col gap-2">
         <div class="row-span-3 mt-16 "><!--1-->
             <img class="col-span-2 ml-2"
                 src=" https://image.tmdb.org/t/p/w200/{{$movies->poster_path}}" width="220" height="220" alt="{{$movies->title}}">
         </div>
-        <div class="col-span-2 bg-[#507687] mt-16 lg:mr-3"><!--2-->
-            <div class="pl-4 pt-2 text-[#FCFAEE]">
+        <div class="col-span-2 bg-white bg-opacity-50 mt-16 lg:mr-3"><!--2-->
+            <div class="pl-4 pt-2 ">
                 <strong class=" text-4xl flex">
                     {{$movies->title}}
                     ({{substr($movies->release_date , 0 , 4) }})
@@ -65,16 +65,16 @@
         <span class="text-3xl">cast</span>
         <div class=" col-span-2 flex  overflow-x-auto gap-2 "><!--3-->
             @forelse ($movies->actors as $actor)
-            <p class="text-base border-2 p-1  min-w-[150px]  bg-[#507687]">
+            <p class="text-base border-2 p-1  min-w-[150px]  bg-white bg-opacity-50">
                 {{ $actor->name }}
                 /
                 @if ($actor->pivot->character)
-                <span class="text-[#FCFAEE] pl-3">as
+                <span class=" pl-3">as
                     {{ $actor->pivot->character }}
                 </span>
                 @endif
                 @empty
-                <li class="text-xl text-gray-500">No actors found for this movie.</li>
+                <li class="text-xl ">No actors found for this movie.</li>
                 @endforelse
 
         </div>
@@ -90,7 +90,7 @@
                     @if ($loop->iteration <= 2)
                         <div class="border-2 rounded-lg lg:mx-16 sm:mx-6 mt-1 shadow-md ">
                         <p class=" p-5">
-                            A review by {{$user->getUserName( $comment->user_id)}}
+                            A review by {{$user->getUserName( $comment->user_id)}}:
                             <span class="text-base">
                                 written on {{str_replace("-", "/",  strstr($comment->created_at , ' ' , true))}}
                                 {{strtotime(5)}}

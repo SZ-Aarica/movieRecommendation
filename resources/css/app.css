@@ -4,3 +4,8 @@
 
 
 
+.container {
+
+background-image: url('image/taps.jpg');
+ background-size: cover;
+}
